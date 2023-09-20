@@ -3,11 +3,12 @@ var cron = require('node-cron');
 var router = express.Router();
 var mysql = require('mysql')
 var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "project",
-    // port: '9000'
+    host: "iptmkmutnb.com",
+    user: "iptmkmutnb_bbcommerce",
+    password: "BBcommerce2023",
+    database: "iptmkmutnb_bbcommerce",
+    charset: 'utf8mb4'
+    // port: '3306'
 })
 
 // var con = mysql.createConnection({
@@ -569,6 +570,7 @@ router.get('/sendNotificationProductFreez', function (req, res, next) {
                     infoText += productData[j].itemname
                     infoText += "\n"
                 }
+                console.log(infoText)
                 var mailOptions = {
                     from: 'note707170719@gmail.com',
                     to: rows[i].email,
@@ -577,7 +579,6 @@ router.get('/sendNotificationProductFreez', function (req, res, next) {
                 };
                 transporter.sendMail(mailOptions, function (error, info) {
                     if (error) {
-                        console.log(error);
                     } else {
                         console.log('Email sent: ' + info.response);
                     }
@@ -662,7 +663,7 @@ router.get('/abc', function (req, res, next) {
 //     }
 //   }
 // schedule
-cron.schedule('*/30 * * * *', function () {
+cron.schedule('*/1 * * * *', function () {
 
     var productFreezData = []
     var productLessData = []
@@ -684,35 +685,30 @@ cron.schedule('*/30 * * * *', function () {
     con.query("SELECT * FROM userdb ", function (err, rows, fields) {
         if (err) throw err
         for (var i = 0; i < rows.length; i++) {
-
-            var infoText = "<div>"
-
+            var infoText = "<html><head><meta http-equiv='Content-Language' content='th'/><meta http-equiv='Content-Type' content='text/html; charset=utf-8'/></head><body><div>";
+        
             // ไม่เคลื่อนไหว 30 วัน
-            infoText += "<h1> รายการสินค้าไม่เคลื่อนไหวภายใน 30 วัน " + productFreezData.length + " รายการ </h1> \n";
+            infoText += "<h1> รายการสินค้าไม่เคลื่อนไหวภายใน 30 วัน " + productFreezData.length + " รายการ </h1>\n";
             for (var j = 0; j < productFreezData.length; j++) {
-                infoText += "<h2> " + (j + 1) + ". " + productFreezData[j].itemname + "</h2> "
-                infoText += "\n"
+                console.log(productFreezData[j])
+                infoText += "<p> " + (j + 1) + ". " + productFreezData[j].itemname + "</p>\n";
             }
-
-            infoText += "\n"
-
-
+        
             // สินค้าเหลือน้อยกว่า 10 ชิ้น
             infoText += "<h1> รายการสินค้าสินค้าเหลือน้อยกว่า 10 ชิ้น " + productLessData.length + " รายการ  </h1>\n";
             for (var j = 0; j < productLessData.length; j++) {
-                infoText += "<h2> " + (j + 1) + ". " + productLessData[j].itemname + "</h2> "
-                infoText += "\n"
+                infoText += "<p> " + (j + 1) + ". " + productLessData[j].itemname + "</p>\n";
             }
-
-
-            infoText += "</div>"
+        
+            infoText += "</div></body></html>";
+            console.log(infoText)
             var mailOptions = {
                 from: 'note707170719@gmail.com',
                 to: rows[i].email,
                 subject: "สินค้าไม่เคลื่อนไหวเกิน 30 วัน",
-                html: infoText
+                html: infoText,
             };
-
+        
             transporter.sendMail(mailOptions, function (error, info) {
                 if (error) {
                     console.log(error);
@@ -720,9 +716,6 @@ cron.schedule('*/30 * * * *', function () {
                     console.log('Email sent: ' + info.response);
                 }
             });
-
-
-
         }
     })
 
