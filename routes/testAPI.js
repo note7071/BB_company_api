@@ -12,7 +12,7 @@ const con  = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10, // Adjust the limit as needed
     queueLimit: 0, // No limit on the connection queue
-    // port: '2121'
+    port: '3306'
 })
 
 // var con = mysql.createConnection({
