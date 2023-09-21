@@ -1,13 +1,16 @@
 var express = require('express');
 var cron = require('node-cron');
 var router = express.Router();
-var mysql = require('mysql')
-var con = mysql.createConnection({
+var mysql = require('mysql2')
+const con  = mysql.createPool({
     host: "iptmkmutnb.com",
     user: "iptmkmutnb_bbcommerce",
     password: "BBcommerce2023",
     database: "iptmkmutnb_bbcommerce",
-    charset: 'utf8mb4'
+    charset: 'utf8mb4',
+    waitForConnections: true,
+    connectionLimit: 10, // Adjust the limit as needed
+    queueLimit: 0, // No limit on the connection queue
     // port: '3306'
 })
 
@@ -19,13 +22,19 @@ var con = mysql.createConnection({
 //     // port: '2121'
 // })
 
-con.connect((err) => {
-    if (err) { // กรณีเกิด error
-        console.error('error connecting: ' + err.stack)
-        return
+// Get a connection from the pool
+con.getConnection((err, connection) => {
+    if (err) {
+      console.error('Error getting connection from pool: ' + err.stack);
+      return;
     }
-    console.log('connected as id ' + con.threadId)
-})
+  
+    // Use the connection for database operations
+    console.log('Connected as id ' + connection.threadId);
+  
+    // Release the connection when done
+    connection.release();
+  });
 
 
 //set init email
