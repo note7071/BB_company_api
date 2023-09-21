@@ -3,42 +3,80 @@ var cron = require('node-cron');
 var router = express.Router();
 var mysql = require('mysql2')
 
-const dbHost = process.env.DB_HOST;
-const dbUser = process.env.DB_USER;
-const dbPassword = process.env.DB_PASSWORD;
-const dbName = process.env.DB_NAME;
 
-const con  = mysql.createPool({
-    host: dbHost,
-    user: dbUser,
-    password: dbPassword,
-    database: dbName,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-  });
+const dbConfig = {
+    dbHost: process.env.DB_HOST,
+    dbUser: process.env.DB_USER,
+    dbPassword: process.env.DB_PASSWORD,
+    dbName: process.env.DB_NAME,
+  };
 
-// var con = mysql.createConnection({
-//     host: "iptmkmutnb.com",
-//     user: "bbcommerce",
-//     password: "BBCommerce2021",
-//     database: "iptmkmutnb_bbcommerce"
-//     // port: '2121'
-// })
-
-// Get a connection from the pool
-con.getConnection((err, connection) => {
-    if (err) {
-      console.error('Error getting connection from pool: ' + err.stack);
-      return;
+  // Function to establish a database connection with retries
+function connectWithRetry() {
+    const maxRetries = 5; // Maximum number of connection attempts
+    let retryCount = 0;
+  
+    function doConnect() {
+      const con = mysql.createPool(dbConfig);
+  
+      con.getConnection((err, connection) => {
+        if (err) {
+          if (retryCount < maxRetries) {
+            console.error('Error getting connection from pool. Retrying in 5 seconds...');
+            retryCount++;
+            setTimeout(doConnect, 5000); // Retry after 5 seconds
+          } else {
+            console.error('Max retry attempts reached. Unable to connect to the database.');
+          }
+          return;
+        }
+  
+        console.log('Connected as id ' + connection.threadId);
+        // You can use the 'connection' object for database operations here
+  
+        // Release the connection when done
+        connection.release();
+      });
     }
   
-    // Use the connection for database operations
-    console.log('Connected as id ' + connection.threadId);
+    doConnect(); // Start the initial connection attempt
+  }
   
-    // Release the connection when done
-    connection.release();
-  });
+  // Call the connectWithRetry function to start the connection process
+  connectWithRetry();
+
+// const con  = mysql.createPool({
+//     host: dbHost,
+//     user: dbUser,
+//     password: dbPassword,
+//     database: dbName,
+//     waitForConnections: true,
+//     connectionLimit: 10,
+//     queueLimit: 0,
+//   });
+
+// // var con = mysql.createConnection({
+// //     host: "iptmkmutnb.com",
+// //     user: "bbcommerce",
+// //     password: "BBCommerce2021",
+// //     database: "iptmkmutnb_bbcommerce"
+// //     // port: '2121'
+// // })
+
+// // Get a connection from the pool
+// con.getConnection((err, connection) => {
+//     if (err) {
+//       console.error('Error getting connection from pool: ' + err.stack);
+//       return;
+//     }
+  
+//     // Use the connection for database operations
+//     console.log('Connected as id ' + connection.threadId);
+  
+//     // Release the connection when done
+//     connection.release();
+//   });
+  
 
 
 //set init email
