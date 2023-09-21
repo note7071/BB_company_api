@@ -27,15 +27,15 @@ const con  = mysql.createPool({
 con.getConnection((err, connection) => {
     if (err) {
       console.error('Error getting connection from pool: ' + err.stack);
+      console.error('Error Code: ' + err.code); // log error code
+      console.error('SQL State: ' + err.sqlState); // log SQL state
+      console.error('Fatal: ' + err.fatal); // log if it's a fatal error
       return;
     }
-  
-    // Use the connection for database operations
+
     console.log('Connected as id ' + connection.threadId);
-  
-    // Release the connection when done
     connection.release();
-  });
+});
 
 
 //set init email
