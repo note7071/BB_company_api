@@ -5,10 +5,10 @@ var mysql = require('mysql2')
 
 
 const dbConfig = {
-    dbHost: process.env.DB_HOST,
-    dbUser: process.env.DB_USER,
-    dbPassword: process.env.DB_PASSWORD,
-    dbName: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
   };
 
   // Function to establish a database connection with retries
