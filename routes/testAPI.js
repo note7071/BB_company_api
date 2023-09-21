@@ -2,17 +2,21 @@ var express = require('express');
 var cron = require('node-cron');
 var router = express.Router();
 var mysql = require('mysql2')
+
+const dbHost = process.env.DB_HOST;
+const dbUser = process.env.DB_USER;
+const dbPassword = process.env.DB_PASSWORD;
+const dbName = process.env.DB_NAME;
+
 const con  = mysql.createPool({
-    host: "iptmkmutnb.com",
-    user: "iptmkmutnb_bbcommerce",
-    password: "BBcommerce2023",
-    database: "iptmkmutnb_bbcommerce",
-    charset: 'utf8mb4',
+    host: dbHost,
+    user: dbUser,
+    password: dbPassword,
+    database: dbName,
     waitForConnections: true,
-    connectionLimit: 10, // Adjust the limit as needed
-    queueLimit: 0, // No limit on the connection queue
-    // port: '3306'
-})
+    connectionLimit: 10,
+    queueLimit: 0,
+  });
 
 // var con = mysql.createConnection({
 //     host: "iptmkmutnb.com",
